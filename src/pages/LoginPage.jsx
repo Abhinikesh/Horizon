@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Globe, Eye, EyeOff } from 'lucide-react'
+import { Globe, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { authAPI } from '../services/api'
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -12,18 +13,25 @@ const GoogleIcon = () => (
 )
 
 export default function LoginPage() {
-  const [showPw, setShowPw] = useState(false)
-  const [email,  setEmail]  = useState('')
+  const [showPw,  setShowPw]  = useState(false)
+  const [email,   setEmail]   = useState('')
+  const [password,setPassword]= useState('')
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    localStorage.setItem('360tales_auth', '1')
-    localStorage.setItem('360tales_email', email)
-    if (!localStorage.getItem('360tales_name')) {
-      localStorage.setItem('360tales_name', email.split('@')[0])
+    setError('')
+    setLoading(true)
+    try {
+      await authAPI.login(email, password)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setLoading(false)
     }
-    navigate('/dashboard')
   }
 
   return (
@@ -43,6 +51,13 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
         <p className="text-sm text-gray-500 mb-7">Sign in to your account to continue.</p>
 
+        {error && (
+          <div className="flex items-start gap-2.5 p-3.5 mb-4 rounded-lg bg-red-50 border border-red-200">
+            <AlertCircle size={15} className="text-red-500 mt-0.5 shrink-0" />
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Email */}
           <div>
@@ -56,6 +71,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -74,7 +90,10 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 placeholder="••••••••"
                 className="form-input pr-10"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
               <button
                 type="button"
@@ -88,8 +107,17 @@ export default function LoginPage() {
           </div>
 
           {/* Submit */}
-          <button type="submit" className="btn-primary w-full py-3 text-sm mt-2">
-            Log In
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full py-3 text-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Signing in…
+              </span>
+            ) : 'Log In'}
           </button>
         </form>
 
@@ -100,7 +128,7 @@ export default function LoginPage() {
           <span className="flex-1 h-px bg-gray-200" />
         </div>
 
-        {/* Google */}
+        {/* Google (UI only) */}
         <button
           type="button"
           className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all active:scale-[.98]"

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Globe, Eye, EyeOff, Check } from 'lucide-react'
+import { Globe, Eye, EyeOff, Check, AlertCircle } from 'lucide-react'
+import { authAPI } from '../services/api'
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -31,17 +32,25 @@ export default function SignupPage() {
   const [confirm,  setConfirm]  = useState('')
   const [fullName, setFullName] = useState('')
   const [email,    setEmail]    = useState('')
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
   const strength = getStrength(password)
   const pwMatch = confirm.length > 0 && password === confirm
   const navigate = useNavigate()
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
     if (!pwMatch) return
-    localStorage.setItem('360tales_auth',  '1')
-    localStorage.setItem('360tales_name',  fullName || 'Creator')
-    localStorage.setItem('360tales_email', email)
-    navigate('/dashboard')
+    setError('')
+    setLoading(true)
+    try {
+      await authAPI.signup(fullName, email, password)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message || 'Failed to create account. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -61,6 +70,13 @@ export default function SignupPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
         <p className="text-sm text-gray-500 mb-7">Get started for free — no credit card required.</p>
 
+        {error && (
+          <div className="flex items-start gap-2.5 p-3.5 mb-4 rounded-lg bg-red-50 border border-red-200">
+            <AlertCircle size={15} className="text-red-500 mt-0.5 shrink-0" />
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Full name */}
           <div>
@@ -74,6 +90,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={e => setFullName(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -89,6 +106,7 @@ export default function SignupPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -105,6 +123,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
               <button
                 type="button"
@@ -155,6 +174,7 @@ export default function SignupPage() {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 required
+                disabled={loading}
               />
               <button
                 type="button"
@@ -174,8 +194,17 @@ export default function SignupPage() {
           </div>
 
           {/* Submit */}
-          <button type="submit" className="btn-primary w-full py-3 text-sm mt-2">
-            Create Account
+          <button
+            type="submit"
+            disabled={loading || !pwMatch}
+            className="btn-primary w-full py-3 text-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Creating account…
+              </span>
+            ) : 'Create Account'}
           </button>
         </form>
 
@@ -186,7 +215,7 @@ export default function SignupPage() {
           <span className="flex-1 h-px bg-gray-200" />
         </div>
 
-        {/* Google */}
+        {/* Google (UI only) */}
         <button
           type="button"
           className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all active:scale-[.98]"

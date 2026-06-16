@@ -10,34 +10,68 @@ const STEPS = [
   'Finalizing output…',
 ]
 
-export default function ProcessingScreen({ onComplete }) {
-  const [stepIdx,  setStepIdx]  = useState(0)
-  const [progress, setProgress] = useState(0)
+/**
+ * ProcessingScreen
+ *
+ * Props:
+ *  - useDemoTimer  : boolean  — use a local 12s fake timer (no backend)
+ *  - progress      : number   — 0-100, driven by real backend poll
+ *  - stepIndex     : number   — 0-5, driven by real backend poll
+ *  - onComplete    : fn       — called when processing finishes
+ */
+export default function ProcessingScreen({
+  useDemoTimer = false,
+  progress: externalProgress = 0,
+  stepIndex: externalStep = 0,
+  onComplete,
+}) {
+  const [localProgress, setLocalProgress] = useState(0)
+  const [localStep,     setLocalStep]     = useState(0)
 
-  /* Cycle steps every 2.5s */
-  useEffect(() => {
-    const t = setInterval(() => setStepIdx(s => Math.min(s + 1, STEPS.length - 1)), 2500)
-    return () => clearInterval(t)
-  }, [])
+  const progress = useDemoTimer ? localProgress : externalProgress
+  const stepIdx  = useDemoTimer ? localStep     : externalStep
 
-  /* Smooth progress over 12s */
+  /* ── Demo timer mode ── */
   useEffect(() => {
+    if (!useDemoTimer) return
+
+    // Cycle steps every 2.5s
+    const stepTimer = setInterval(() =>
+      setLocalStep(s => Math.min(s + 1, STEPS.length - 1)), 2500)
+
+    // Smooth progress over 12s then fire onComplete
     const start    = performance.now()
-    const DURATION = 12000
+    const DURATION = 12_000
     let raf
     const tick = now => {
       const pct = Math.min(100, Math.round(((now - start) / DURATION) * 100))
-      setProgress(pct)
-      if (pct < 100) raf = requestAnimationFrame(tick)
-      else setTimeout(onComplete, 500)
+      setLocalProgress(pct)
+      if (pct < 100) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        setTimeout(onComplete, 600)
+      }
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [onComplete])
+
+    return () => {
+      clearInterval(stepTimer)
+      cancelAnimationFrame(raf)
+    }
+  }, [useDemoTimer, onComplete])
+
+  /* ── Real backend mode: fire onComplete when progress hits 100 ── */
+  useEffect(() => {
+    if (!useDemoTimer && externalProgress >= 100) {
+      setTimeout(onComplete, 800)
+    }
+  }, [useDemoTimer, externalProgress, onComplete])
 
   const RADIUS = 54
   const CIRC   = 2 * Math.PI * RADIUS
   const offset = CIRC - (progress / 100) * CIRC
+
+  const remaining = Math.max(0, Math.ceil(((100 - progress) / 100) * (useDemoTimer ? 12 : 90)))
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6">
@@ -60,7 +94,7 @@ export default function ProcessingScreen({ onComplete }) {
               strokeLinecap="round"
               strokeDasharray={CIRC}
               strokeDashoffset={offset}
-              style={{ transition: 'stroke-dashoffset 0.4s ease' }}
+              style={{ transition: 'stroke-dashoffset 0.6s ease' }}
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -87,15 +121,13 @@ export default function ProcessingScreen({ onComplete }) {
         <div className="w-full space-y-2">
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-300"
+              className="h-full bg-blue-600 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
           <div className="flex justify-between text-xs text-gray-400">
             <span>Processing your story</span>
-            <span className="tabular-nums">
-              {Math.max(0, Math.ceil(((100 - progress) / 100) * 12))}s remaining
-            </span>
+            <span className="tabular-nums">~{remaining}s remaining</span>
           </div>
         </div>
       </div>

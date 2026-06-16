@@ -3,18 +3,28 @@ import { Link } from 'react-router-dom'
 import { CheckCircle, Download, Link2, Share2, Globe, Plus, Clock, Film, Mic, HardDrive, X } from 'lucide-react'
 import { useToast } from '../ToastProvider'
 
-const SAMPLE_VIDEO = 'https://www.w3schools.com/html/mov_bbb.mp4'
-const SHARE_LINK   = 'https://360tales.app/share/demo-story-001'
+const SAMPLE_VIDEO  = 'https://www.w3schools.com/html/mov_bbb.mp4'
+const SAMPLE_SHARE  = 'https://360tales.app/share/demo-story-001'
 
-export default function ResultScreen({ fileUrl, format, language, voiceStyle, onCreateAnother }) {
+export default function ResultScreen({ fileUrl, format, language, voiceStyle, resultData, onCreateAnother }) {
   const addToast        = useToast()
-  const [videoErr, setVideoErr]         = useState(false)
-  const [reelsModal, setReelsModal]     = useState(false)
+  const [videoErr, setVideoErr]     = useState(false)
+  const [reelsModal, setReelsModal] = useState(false)
+
+  // Prefer real backend output URL; fall back to sample for demo
+  const videoSrc   = resultData?.output_url || SAMPLE_VIDEO
+  const shareLink  = resultData?.share_url  || SAMPLE_SHARE
+  const duration   = resultData?.duration_seconds
+    ? `${Math.floor(resultData.duration_seconds / 60)}:${String(resultData.duration_seconds % 60).padStart(2, '0')}`
+    : '—'
+  const fileSizeMb = resultData?.file_size_mb
+    ? `${resultData.file_size_mb.toFixed(1)} MB`
+    : '—'
 
   /* ── Download ── */
   const handleDownload = () => {
     const a = document.createElement('a')
-    a.href     = SAMPLE_VIDEO
+    a.href     = videoSrc
     a.download = '360Tales-Story.mp4'
     document.body.appendChild(a)
     a.click()
@@ -24,7 +34,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, on
 
   /* ── Copy share link ── */
   const handleCopy = () => {
-    navigator.clipboard.writeText(SHARE_LINK).catch(() => {})
+    navigator.clipboard.writeText(shareLink).catch(() => {})
     addToast('Link copied to clipboard!')
   }
 
@@ -63,7 +73,6 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, on
           {/* ── Video player — 2 cols ── */}
           <div className="lg:col-span-2 space-y-4">
             {videoErr ? (
-              /* Error state */
               <div className="rounded-xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center py-16 px-8 text-center gap-4">
                 <div className="text-4xl">🎬</div>
                 <p className="text-sm font-semibold text-gray-700">Video preview unavailable</p>
@@ -72,7 +81,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, on
             ) : (
               <div className="rounded-xl overflow-hidden bg-black border border-gray-200 shadow-sm">
                 <video
-                  src={SAMPLE_VIDEO}
+                  src={videoSrc}
                   controls
                   autoPlay
                   loop
@@ -126,10 +135,10 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, on
                 <h3 className="text-sm font-semibold text-gray-900">Video Details</h3>
                 <dl className="space-y-2.5">
                   {[
-                    { icon: Clock,     label: 'Duration',  value: '2:15'                            },
+                    { icon: Clock,     label: 'Duration',  value: duration },
                     { icon: Film,      label: 'Format',    value: format || 'Standard MP4 · 1080p'  },
                     { icon: Mic,       label: 'Narration', value: `${language || 'English'} — ${voiceStyle || 'Natural Female'}` },
-                    { icon: HardDrive, label: 'File size', value: '24.3 MB'                          },
+                    { icon: HardDrive, label: 'File size', value: fileSizeMb },
                   ].map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex items-start gap-2.5">
                       <Icon size={14} className="text-gray-400 mt-0.5 shrink-0" />
@@ -149,6 +158,11 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, on
                 Copy the share link to send your story to anyone — no app required.
               </p>
             </div>
+
+            <Link to="/projects"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+              View All Projects
+            </Link>
           </div>
         </div>
       </div>

@@ -2,16 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   PlusCircle, Eye, Download, Globe as GlobeIcon,
-  Film, Camera, Menu, X, BarChart3, ArrowRight
+  Film, Camera, Menu, BarChart3, ArrowRight, Clock
 } from 'lucide-react'
 import Sidebar from '../components/dashboard/Sidebar'
-
-const STATS = [
-  { label: 'Total Stories',  value: '0',    icon: Film,      color: 'text-blue-600',   bg: 'bg-blue-50'   },
-  { label: 'Total Views',    value: '0',    icon: Eye,       color: 'text-violet-600', bg: 'bg-violet-50' },
-  { label: 'Downloads',      value: '0',    icon: Download,  color: 'text-emerald-600',bg: 'bg-emerald-50'},
-  { label: 'Plan',           value: 'Free', icon: BarChart3, color: 'text-amber-600',  bg: 'bg-amber-50'  },
-]
+import { projectsAPI, authAPI } from '../services/api'
 
 const QUICKSTART = [
   { emoji: '📷', title: 'Upload a Photo',    desc: 'Turn any image into a 360° story',  href: '/create' },
@@ -19,10 +13,16 @@ const QUICKSTART = [
   { emoji: '🌐', title: 'Upload 360° File',  desc: 'From Insta360, GoPro, Ricoh Theta', href: '/create' },
 ]
 
+const STATUS_COLOR = {
+  ready:      'bg-green-100 text-green-700',
+  processing: 'bg-blue-100 text-blue-700',
+  failed:     'bg-red-100 text-red-700',
+  pending:    'bg-gray-100 text-gray-600',
+}
+
 function EmptyProjectsState() {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white rounded-xl border border-dashed border-gray-200">
-      {/* Simple SVG illustration */}
       <svg width="96" height="80" viewBox="0 0 96 80" fill="none" className="mb-6">
         <rect x="8" y="24" width="80" height="52" rx="6" fill="#F3F4F6" />
         <rect x="8" y="24" width="80" height="52" rx="6" stroke="#E5E7EB" strokeWidth="1.5" />
@@ -42,17 +42,87 @@ function EmptyProjectsState() {
   )
 }
 
+function RecentProjectCard({ project }) {
+  const statusClass = STATUS_COLOR[project.status] || STATUS_COLOR.pending
+  const date = new Date(project.created_at).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  })
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all flex items-start gap-4">
+      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shrink-0">
+        <Film size={20} className="text-blue-500" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-semibold text-gray-900 truncate">{project.title}</h3>
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusClass}`}>
+            {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+          </span>
+          <span className="text-[11px] text-gray-400 flex items-center gap-1">
+            <Clock size={10} />
+            {date}
+          </span>
+        </div>
+      </div>
+      {project.output_url && (
+        <a
+          href={project.output_url}
+          download
+          className="text-xs font-semibold text-blue-600 hover:text-blue-700 shrink-0"
+        >
+          Download
+        </a>
+      )}
+    </div>
+  )
+}
+
 export default function DashboardPage() {
-  const navigate  = useNavigate()
+  const navigate      = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [projects,    setProjects]    = useState([])
+  const [userStats,   setUserStats]   = useState({ total_stories: 0, plan: 'free' })
+  const [loading,     setLoading]     = useState(true)
 
   useEffect(() => {
-    if (!localStorage.getItem('360tales_auth')) navigate('/login')
+    if (!localStorage.getItem('360tales_auth')) { navigate('/login'); return }
+    fetchData()
   }, [navigate])
 
-  const name = localStorage.getItem('360tales_name') || 'Creator'
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const [projs, me] = await Promise.allSettled([
+        projectsAPI.list(),
+        authAPI.me(),
+      ])
+      if (projs.status === 'fulfilled')  setProjects(projs.value || [])
+      if (me.status    === 'fulfilled')  setUserStats(me.value || {})
+    } catch (_) {
+      // silently ignore — show empty state
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const name = userStats.name || localStorage.getItem('360tales_name') || 'Creator'
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+
+  const totalStories = userStats.total_stories ?? projects.length
+  const totalViews   = 0   // not tracked yet
+  const totalDownloads = projects.filter(p => p.status === 'ready').length
+  const plan = (userStats.plan || 'free').charAt(0).toUpperCase() + (userStats.plan || 'free').slice(1)
+
+  const STATS = [
+    { label: 'Total Stories',  value: String(totalStories),  icon: Film,      color: 'text-blue-600',   bg: 'bg-blue-50'   },
+    { label: 'Total Views',    value: String(totalViews),    icon: Eye,       color: 'text-violet-600', bg: 'bg-violet-50' },
+    { label: 'Downloads',      value: String(totalDownloads),icon: Download,  color: 'text-emerald-600',bg: 'bg-emerald-50'},
+    { label: 'Plan',           value: plan,                   icon: BarChart3, color: 'text-amber-600',  bg: 'bg-amber-50'  },
+  ]
+
+  const recentProjects = projects.slice(0, 3)
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">
@@ -111,10 +181,14 @@ export default function DashboardPage() {
                       <Icon size={18} className={color} strokeWidth={1.75} />
                     </div>
                     {label === 'Plan' && (
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Free</span>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                        {value}
+                      </span>
                     )}
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">{value}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {label === 'Plan' ? plan : value}
+                  </p>
                   <p className="text-xs text-gray-500 mt-0.5">{label}</p>
                 </div>
               ))}
@@ -124,8 +198,26 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-semibold text-gray-900">Recent Projects</h2>
+                {projects.length > 0 && (
+                  <Link to="/projects" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                    View all <ArrowRight size={14} />
+                  </Link>
+                )}
               </div>
-              <EmptyProjectsState />
+
+              {loading ? (
+                <div className="space-y-3">
+                  {[1,2].map(i => (
+                    <div key={i} className="h-20 bg-white rounded-xl border border-gray-200 animate-pulse" />
+                  ))}
+                </div>
+              ) : recentProjects.length > 0 ? (
+                <div className="space-y-3">
+                  {recentProjects.map(p => <RecentProjectCard key={p.id} project={p} />)}
+                </div>
+              ) : (
+                <EmptyProjectsState />
+              )}
             </div>
 
             {/* Quick Start */}
