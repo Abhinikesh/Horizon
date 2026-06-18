@@ -7,16 +7,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ─── Lifespan (replaces deprecated @app.on_event) ─────────────────────────────
+# ─── Ensure required directories exist at import time ─────────────────────────
+# StaticFiles.mount() requires directories to already exist, so we create them
+# here — before the app is constructed — rather than only in lifespan().
+for _folder in ["uploads", "outputs", "outputs/videos", "outputs/audio", "outputs/depth"]:
+    os.makedirs(_folder, exist_ok=True)
+
+
+# ─── Lifespan ─────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # Re-ensure dirs (no-op if already exist) and init DB tables
     for folder in ["uploads", "outputs", "outputs/videos", "outputs/audio", "outputs/depth"]:
         os.makedirs(folder, exist_ok=True)
     from models.database import init_db
     await init_db()
     yield
     # Shutdown (nothing needed)
+
 
 app = FastAPI(
     title="360Tales API",
@@ -52,3 +60,4 @@ app.include_router(tts.router,      prefix="/api/tts",      tags=["tts"])
 @app.get("/api/health", tags=["health"])
 async def health():
     return {"status": "ok", "service": "360Tales API", "version": "1.0.0"}
+

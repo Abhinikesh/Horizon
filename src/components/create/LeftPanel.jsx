@@ -41,7 +41,7 @@ export default function LeftPanel({ onFileSelect, fileUrl }) {
       {/* Tab content */}
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'upload' && (
-          <UploadTab onFileSelect={f => onFileSelect(f, false)} fileUrl={fileUrl && !false} />
+          <UploadTab onFileSelect={f => onFileSelect(f, false)} fileUrl={!!fileUrl} />
         )}
         {activeTab === 'camera' && (
           <CameraTab onCapture={f => onFileSelect(f, false)} />
