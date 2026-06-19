@@ -4,7 +4,7 @@ import { CheckCircle, Download, Link2, Share2, Globe, Plus, Clock, Film, Mic, Ha
 import { useToast } from '../ToastProvider'
 
 const SAMPLE_VIDEO  = 'https://www.w3schools.com/html/mov_bbb.mp4'
-const SAMPLE_SHARE  = 'https://360tales.app/share/demo-story-001'
+const SAMPLE_SHARE  = 'https://horizon.app/share/demo-story-001'
 
 export default function ResultScreen({ fileUrl, format, language, voiceStyle, resultData, onCreateAnother }) {
   const addToast        = useToast()
@@ -25,7 +25,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, re
   const handleDownload = () => {
     const a = document.createElement('a')
     a.href     = videoSrc
-    a.download = '360Tales-Story.mp4'
+    a.download = 'Horizon-Story.mp4'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -47,7 +47,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, re
             <Globe size={14} className="text-white" strokeWidth={2.5} />
           </div>
           <span className="text-base font-bold text-gray-900">
-            360<span className="text-blue-600">Tales</span>
+            Hori<span className="text-blue-600">zon</span>
           </span>
         </Link>
         <div className="flex-1" />

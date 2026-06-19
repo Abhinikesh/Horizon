@@ -47,7 +47,7 @@ const plans = [
     price: { monthly: 79, annual: 59 },
     description: 'For agencies, tour operators, and media teams.',
     cta: 'Contact Sales',
-    ctaHref: 'mailto:sales@360tales.app',
+    ctaHref: 'mailto:sales@horizon.app',
     featured: false,
     features: [
       'Everything in Creator',
@@ -187,7 +187,7 @@ export default function Pricing() {
             <p className="font-semibold text-gray-900 text-sm">Need a custom enterprise plan?</p>
             <p className="text-sm text-gray-500 mt-0.5">Custom AI models, on-premise deployment, and dedicated infrastructure.</p>
           </div>
-          <a href="mailto:enterprise@360tales.app" className="btn-outline shrink-0 text-sm">
+          <a href="mailto:enterprise@horizon.app" className="btn-outline shrink-0 text-sm">
             Talk to Sales
           </a>
         </motion.div>

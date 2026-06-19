@@ -41,7 +41,7 @@ async def _cloudinary_upload(local_path: str, resource_type: str) -> str:
         result = cloudinary.uploader.upload(
             local_path,
             resource_type=resource_type,
-            folder="360tales",
+            folder="horizon",
             use_filename=True,
             unique_filename=True,
         )

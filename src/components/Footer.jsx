@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import { Globe, ArrowUpRight } from 'lucide-react'
 
 const footerLinks = {
-  Product:  ['Features', 'Pricing', 'Changelog', 'Roadmap', 'API Docs'],
-  Company:  ['About', 'Blog', 'Careers', 'Press Kit', 'Partners'],
-  Legal:    ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'],
-  Support:  ['Help Center', 'Contact Us', 'Status Page', 'Community'],
+  Product: ['Features', 'Changelog', 'Roadmap', 'API Docs'],
+  Company: ['About', 'Blog', 'Careers', 'Press Kit', 'Partners'],
+  Legal:   ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'],
+  Support: ['Help Center', 'Contact Us', 'Status Page', 'Community'],
 }
 
 const TwitterIcon = () => (
@@ -50,19 +50,17 @@ export default function Footer() {
                 <Globe size={16} className="text-white" strokeWidth={2.5} />
               </div>
               <span className="text-lg font-bold text-gray-900 tracking-tight">
-                360<span className="text-blue-600">Tales</span>
+                Hori<span className="text-blue-600">zon</span>
               </span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed max-w-xs mb-6">
-              Transform tourist destinations into cinematic 360° immersive stories with AI narration. Built for creators, travelers, and tourism professionals.
+              Transform any place into an immersive 360° story. Built for creators, travelers, and tourism professionals.
             </p>
             {/* Socials */}
             <div className="flex gap-2">
               {socials.map(({ Icon, label }) => (
                 <a
-                  key={label}
-                  href="#"
-                  aria-label={label}
+                  key={label} href="#" aria-label={label}
                   className="w-8 h-8 rounded-md border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
                 >
                   <Icon />
@@ -78,10 +76,7 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map(link => (
                   <li key={link}>
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition-colors group"
-                    >
+                    <a href="#" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors group">
                       {link}
                       {(link === 'API Docs' || link === 'Status Page') && (
                         <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -101,18 +96,14 @@ export default function Footer() {
             <p className="text-sm text-gray-500 mt-0.5">Product updates, tutorials, and travel inspiration.</p>
           </div>
           <form className="flex gap-2 w-full sm:w-auto" onSubmit={e => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              className="form-input sm:w-60"
-            />
+            <input type="email" placeholder="you@example.com" className="form-input sm:w-60" />
             <button type="submit" className="btn-primary shrink-0 text-sm">Subscribe</button>
           </form>
         </div>
 
         {/* Bottom bar */}
         <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-gray-400">© {new Date().getFullYear()} 360Tales Inc. All rights reserved.</p>
+          <p className="text-sm text-gray-400">© {new Date().getFullYear()} Horizon Inc. All rights reserved.</p>
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full">
             <span className="w-2 h-2 rounded-full bg-green-500" />
             <span className="text-xs text-gray-500">All systems operational</span>

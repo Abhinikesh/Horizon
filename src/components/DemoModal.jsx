@@ -39,7 +39,7 @@ export default function DemoModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
-                <h2 className="font-semibold text-gray-900">360Tales in Action</h2>
+                <h2 className="font-semibold text-gray-900">Horizon in Action</h2>
                 <p className="text-xs text-gray-500 mt-0.5">Watch how a single photo becomes a 360° experience</p>
               </div>
               <button
@@ -103,7 +103,7 @@ export default function DemoModal({ isOpen, onClose }) {
             <div className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100 bg-gray-50">
               <div>
                 <p className="text-sm font-semibold text-gray-900">Ready to create your own?</p>
-                <p className="text-xs text-gray-500">Free plan available — no credit card needed.</p>
+                <p className="text-xs text-gray-500">Free to use — no credit card needed.</p>
               </div>
               <div className="flex gap-2 shrink-0">
                 <button onClick={onClose} className="btn-outline text-sm px-4 py-2">Close</button>

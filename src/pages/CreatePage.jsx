@@ -23,7 +23,7 @@ export default function CreatePage() {
 
   // Auth guard
   useEffect(() => {
-    if (!localStorage.getItem('360tales_auth')) navigate('/login')
+    if (!localStorage.getItem('horizon_auth')) navigate('/login')
   }, [navigate])
 
   // App flow
@@ -116,7 +116,7 @@ export default function CreatePage() {
     if (!fileUrl) return
 
     // No token or fileId sentinel → demo mode (no backend)
-    if (!localStorage.getItem('360tales_token') || fileId === 'local-preview') {
+    if (!localStorage.getItem('horizon_token') || fileId === 'local-preview') {
       setAppState('processing')
       return
     }

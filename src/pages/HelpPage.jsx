@@ -5,7 +5,7 @@ import Sidebar from '../components/dashboard/Sidebar'
 const FAQS = [
   {
     q: 'What types of photos can I upload?',
-    a: '360Tales accepts JPEG, PNG, WebP, and RAW image formats up to 50 MB per file. For best results, use high-resolution photos taken in landscape orientation with good lighting.',
+    a: 'Horizon accepts JPEG, PNG, WebP, and RAW image formats up to 50 MB per file. For best results, use high-resolution photos taken in landscape orientation with good lighting.',
   },
   {
     q: 'How does the AI 360° effect work?',
@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: 'Can I download my videos?',
-    a: 'Yes. All generated videos can be downloaded as MP4 files directly from the result screen or from My Projects. The Free plan supports up to 5 videos per month at 1080p resolution.',
+    a: 'Yes. All generated videos can be downloaded as MP4 files directly from the result screen or from My Projects. Download unlimited videos in high quality — no limits.',
   },
   {
     q: 'What is the difference between Path A and Path B?',
@@ -192,11 +192,11 @@ export default function HelpPage() {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-0.5">Email Support</h4>
-                    <p className="text-xs font-medium text-blue-600 mb-1">support@360tales.app</p>
+                    <p className="text-xs font-medium text-blue-600 mb-1">support@horizon.app</p>
                     <p className="text-xs text-gray-500">We respond within 24 hours</p>
                   </div>
                   <a
-                    href="mailto:support@360tales.app"
+                    href="mailto:support@horizon.app"
                     className="mt-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-blue-300 text-blue-600 text-sm font-semibold hover:bg-blue-50 transition-colors"
                   >
                     Send Email
@@ -214,7 +214,7 @@ export default function HelpPage() {
                     <p className="text-xs text-gray-500">Get help from the community</p>
                   </div>
                   <a
-                    href="https://discord.gg/360tales"
+                    href="https://discord.gg/horizon"
                     target="_blank"
                     rel="noreferrer"
                     className="mt-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-indigo-300 text-indigo-600 text-sm font-semibold hover:bg-indigo-50 transition-colors"

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
-  PlusCircle, Eye, Download, Globe as GlobeIcon,
-  Film, Camera, Menu, BarChart3, ArrowRight, Clock
+  PlusCircle, Eye, Download, HardDrive,
+  Film, Menu, ArrowRight, Clock
 } from 'lucide-react'
 import Sidebar from '../components/dashboard/Sidebar'
 import { projectsAPI, authAPI } from '../services/api'
@@ -66,11 +66,8 @@ function RecentProjectCard({ project }) {
         </div>
       </div>
       {project.output_url && (
-        <a
-          href={project.output_url}
-          download
-          className="text-xs font-semibold text-blue-600 hover:text-blue-700 shrink-0"
-        >
+        <a href={project.output_url} download
+          className="text-xs font-semibold text-blue-600 hover:text-blue-700 shrink-0">
           Download
         </a>
       )}
@@ -82,11 +79,11 @@ export default function DashboardPage() {
   const navigate      = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [projects,    setProjects]    = useState([])
-  const [userStats,   setUserStats]   = useState({ total_stories: 0, plan: 'free' })
+  const [userStats,   setUserStats]   = useState({ total_stories: 0 })
   const [loading,     setLoading]     = useState(true)
 
   useEffect(() => {
-    if (!localStorage.getItem('360tales_auth')) { navigate('/login'); return }
+    if (!localStorage.getItem('horizon_auth')) { navigate('/login'); return }
     fetchData()
   }, [navigate])
 
@@ -97,8 +94,8 @@ export default function DashboardPage() {
         projectsAPI.list(),
         authAPI.me(),
       ])
-      if (projs.status === 'fulfilled')  setProjects(projs.value || [])
-      if (me.status    === 'fulfilled')  setUserStats(me.value || {})
+      if (projs.status === 'fulfilled') setProjects(projs.value || [])
+      if (me.status    === 'fulfilled') setUserStats(me.value  || {})
     } catch (_) {
       // silently ignore — show empty state
     } finally {
@@ -106,20 +103,18 @@ export default function DashboardPage() {
     }
   }
 
-  const name = userStats.name || localStorage.getItem('360tales_name') || 'Creator'
-  const hour = new Date().getHours()
+  const name     = userStats.name || localStorage.getItem('horizon_name') || 'Creator'
+  const hour     = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
-  const totalStories = userStats.total_stories ?? projects.length
-  const totalViews   = 0   // not tracked yet
-  const totalDownloads = projects.filter(p => p.status === 'ready').length
-  const plan = (userStats.plan || 'free').charAt(0).toUpperCase() + (userStats.plan || 'free').slice(1)
+  const totalStories   = userStats.total_stories ?? projects.length
+  const totalViews     = 0
+  const storageMB      = projects.reduce((acc, p) => acc + (p.file_size_mb || 0), 0).toFixed(1)
 
   const STATS = [
-    { label: 'Total Stories',  value: String(totalStories),  icon: Film,      color: 'text-blue-600',   bg: 'bg-blue-50'   },
-    { label: 'Total Views',    value: String(totalViews),    icon: Eye,       color: 'text-violet-600', bg: 'bg-violet-50' },
-    { label: 'Downloads',      value: String(totalDownloads),icon: Download,  color: 'text-emerald-600',bg: 'bg-emerald-50'},
-    { label: 'Plan',           value: plan,                   icon: BarChart3, color: 'text-amber-600',  bg: 'bg-amber-50'  },
+    { label: 'Total Stories',  value: String(totalStories), icon: Film,      color: 'text-blue-600',   bg: 'bg-blue-50'   },
+    { label: 'Total Views',    value: String(totalViews),   icon: Eye,       color: 'text-violet-600', bg: 'bg-violet-50' },
+    { label: 'Storage Used',   value: `${storageMB} MB`,    icon: HardDrive, color: 'text-emerald-600',bg: 'bg-emerald-50'},
   ]
 
   const recentProjects = projects.slice(0, 3)
@@ -127,7 +122,7 @@ export default function DashboardPage() {
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">
 
-      {/* Sidebar — desktop fixed, mobile overlay */}
+      {/* Sidebar — desktop */}
       <div className="hidden lg:flex w-60 shrink-0 h-full">
         <Sidebar />
       </div>
@@ -147,10 +142,8 @@ export default function DashboardPage() {
 
         {/* Top bar */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 lg:px-6 gap-4 shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-          >
+          <button onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
             <Menu size={20} />
           </button>
           <div className="flex-1" />
@@ -172,23 +165,16 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500 mt-1">Start creating your next immersive story.</p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Stats — 3 cards, no Plan card */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {STATS.map(({ label, value, icon: Icon, color, bg }) => (
                 <div key={label} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-3">
                     <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center`}>
                       <Icon size={18} className={color} strokeWidth={1.75} />
                     </div>
-                    {label === 'Plan' && (
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                        {value}
-                      </span>
-                    )}
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {label === 'Plan' ? plan : value}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{value}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{label}</p>
                 </div>
               ))}

@@ -3,15 +3,14 @@ import { Link } from 'react-router-dom'
 import { Globe, Menu, X } from 'lucide-react'
 
 const navLinks = [
-  { label: 'Home',          href: '/#home' },
-  { label: 'How It Works',  href: '/#how-it-works' },
-  { label: 'Features',      href: '/#features' },
-  { label: 'Pricing',       href: '/#pricing' },
+  { label: 'Home',         href: '/#home' },
+  { label: 'How It Works', href: '/#how-it-works' },
+  { label: 'Features',     href: '/#features' },
 ]
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled]  = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -29,7 +28,7 @@ export default function Navbar() {
             <Globe size={16} className="text-white" strokeWidth={2.5} />
           </div>
           <span className="text-lg font-bold text-gray-900 tracking-tight">
-            360<span className="text-blue-600">Tales</span>
+            Hori<span className="text-blue-600">zon</span>
           </span>
         </Link>
 
@@ -39,7 +38,7 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 rounded-md hover:bg-gray-50 transition-colors"
             >
               {link.label}
             </a>
@@ -75,7 +74,7 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
               >
                 {link.label}
               </a>

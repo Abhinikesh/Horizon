@@ -1,9 +1,7 @@
 import os
 import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
-from fastapi.responses import JSONResponse
 from models.database import get_db
-from models.user import User
 from utils.auth_utils import make_current_user_dep
 from utils.file_utils import (
     validate_image, validate_video, validate_size,
@@ -24,7 +22,7 @@ def _make_url(path: str, base: str = "http://localhost:8000") -> str:
 @router.post("/image")
 async def upload_image(
     file: UploadFile = File(...),
-    current_user: User = Depends(_get_current_user),
+    current_user: dict = Depends(_get_current_user),
 ):
     validate_image(file)
     data = await file.read()
@@ -35,12 +33,12 @@ async def upload_image(
     size = get_file_size_mb(path)
 
     meta = {
-        "file_id":   file_id,
-        "filename":  file.filename,
-        "file_url":  _make_url(path),
-        "local_path": path,
-        "width":     w,
-        "height":    h,
+        "file_id":      file_id,
+        "filename":     file.filename,
+        "file_url":     _make_url(path),
+        "local_path":   path,
+        "width":        w,
+        "height":       h,
         "file_size_mb": size,
         "content_type": file.content_type,
     }
@@ -51,7 +49,7 @@ async def upload_image(
 @router.post("/video")
 async def upload_video(
     file: UploadFile = File(...),
-    current_user: User = Depends(_get_current_user),
+    current_user: dict = Depends(_get_current_user),
 ):
     validate_video(file)
     data = await file.read()
@@ -61,10 +59,10 @@ async def upload_video(
     size = get_file_size_mb(path)
 
     meta = {
-        "file_id":    file_id,
-        "filename":   file.filename,
-        "file_url":   _make_url(path),
-        "local_path": path,
+        "file_id":      file_id,
+        "filename":     file.filename,
+        "file_url":     _make_url(path),
+        "local_path":   path,
         "file_size_mb": size,
         "content_type": file.content_type,
     }
@@ -75,7 +73,7 @@ async def upload_video(
 @router.get("/{file_id}")
 async def get_file_info(
     file_id: str,
-    current_user: User = Depends(_get_current_user),
+    current_user: dict = Depends(_get_current_user),
 ):
     meta = _file_registry.get(file_id)
     if not meta:

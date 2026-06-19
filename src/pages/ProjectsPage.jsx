@@ -130,7 +130,7 @@ export default function ProjectsPage() {
   const [toast,       setToast]       = useState(null)
 
   useEffect(() => {
-    if (!localStorage.getItem('360tales_auth')) { navigate('/login'); return }
+    if (!localStorage.getItem('horizon_auth')) { navigate('/login'); return }
     loadProjects()
   }, [navigate])
 

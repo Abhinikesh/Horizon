@@ -12,14 +12,14 @@ const NAV = [
 
 export default function Sidebar({ onClose }) {
   const navigate = useNavigate()
-  const name  = localStorage.getItem('360tales_name')  || 'Creator'
-  const email = localStorage.getItem('360tales_email') || 'you@example.com'
+  const name  = localStorage.getItem('horizon_name')  || 'Creator'
+  const email = localStorage.getItem('horizon_email') || 'you@example.com'
 
   const handleLogout = () => {
     clearToken()
-    localStorage.removeItem('360tales_auth')
-    localStorage.removeItem('360tales_name')
-    localStorage.removeItem('360tales_email')
+    localStorage.removeItem('horizon_auth')
+    localStorage.removeItem('horizon_name')
+    localStorage.removeItem('horizon_email')
     navigate('/login')
   }
 
@@ -32,7 +32,7 @@ export default function Sidebar({ onClose }) {
             <Globe size={14} className="text-white" strokeWidth={2.5} />
           </div>
           <span className="text-base font-bold text-gray-900 tracking-tight">
-            360<span className="text-blue-600">Tales</span>
+            Hori<span className="text-blue-600">zon</span>
           </span>
         </NavLink>
       </div>

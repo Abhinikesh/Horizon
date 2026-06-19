@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,6 +41,38 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
+  }
+
+  /* ── Global text visibility fixes ── */
+  h1, h2, h3, h4, h5, h6 {
+    color: #111827;
+    font-weight: 700;
+  }
+
+  p {
+    color: #374151;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  input, select, textarea {
+    color: #111827;
+    background-color: #ffffff;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  label {
+    color: #374151;
+  }
+
+  /* Ensure text is always visible on white backgrounds */
+  .text-white {
+    color: #ffffff !important;
   }
 }
 

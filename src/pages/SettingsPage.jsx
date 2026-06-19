@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Lock, Sliders, CreditCard, Trash2, Upload, Eye, EyeOff, ChevronDown, Menu } from 'lucide-react'
+import { User, Lock, Sliders, Trash2, Upload, Eye, EyeOff, ChevronDown, Menu } from 'lucide-react'
 import Sidebar from '../components/dashboard/Sidebar'
 import { api, clearToken } from '../services/api'
 
@@ -33,11 +33,11 @@ export default function SettingsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!localStorage.getItem('360tales_auth')) navigate('/login')
+    if (!localStorage.getItem('horizon_auth')) navigate('/login')
   }, [navigate])
 
-  const [name,       setName]       = useState(localStorage.getItem('360tales_name')  || '')
-  const [email,      setEmail]      = useState(localStorage.getItem('360tales_email') || '')
+  const [name,       setName]       = useState(localStorage.getItem('horizon_name')  || '')
+  const [email,      setEmail]      = useState(localStorage.getItem('horizon_email') || '')
   const [saved,      setSaved]      = useState(false)
   const [showOld,    setShowOld]    = useState(false)
   const [showNew,    setShowNew]    = useState(false)
@@ -55,8 +55,8 @@ export default function SettingsPage() {
     } catch {
       // backend unavailable; fall through to localStorage only
     }
-    localStorage.setItem('360tales_name',  name)
-    localStorage.setItem('360tales_email', email)
+    localStorage.setItem('horizon_name',  name)
+    localStorage.setItem('horizon_email', email)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -102,7 +102,6 @@ export default function SettingsPage() {
             {/* ── PROFILE ── */}
             <Section id="profile" title="Profile" icon={User}>
               <form onSubmit={handleSaveProfile} className="space-y-4">
-                {/* Avatar upload */}
                 <div className="flex items-center gap-4 mb-2">
                   <div className="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-200 flex items-center justify-center">
                     <User size={24} className="text-blue-600" />
@@ -136,15 +135,15 @@ export default function SettingsPage() {
             <Section id="password" title="Change Password" icon={Lock}>
               <form className="space-y-4" onSubmit={e => { e.preventDefault(); setOldPw(''); setNewPw(''); setConfPw('') }}>
                 {[
-                  { label: 'Current Password', val: oldPw, set: setOldPw, show: showOld, tog: setShowOld },
-                  { label: 'New Password',      val: newPw, set: setNewPw, show: showNew, tog: setShowNew },
+                  { label: 'Current Password', val: oldPw,  set: setOldPw,  show: showOld,  tog: setShowOld  },
+                  { label: 'New Password',      val: newPw,  set: setNewPw,  show: showNew,  tog: setShowNew  },
                   { label: 'Confirm Password',  val: confPw, set: setConfPw, show: showConf, tog: setShowConf },
                 ].map(({ label, val, set, show, tog }) => (
                   <FormField key={label} label={label}>
                     <div className="relative">
                       <input
-                        type={show ? 'text' : 'password'}
-                        value={val} onChange={e => set(e.target.value)}
+                        type={show ? 'text' : 'password'} value={val}
+                        onChange={e => set(e.target.value)}
                         className="form-input pr-10" placeholder="••••••••"
                       />
                       <button type="button" onClick={() => tog(v => !v)}
@@ -178,27 +177,6 @@ export default function SettingsPage() {
                   </div>
                 </FormField>
                 <button className="btn-primary text-sm px-5 py-2.5">Save Preferences</button>
-              </div>
-            </Section>
-
-            {/* ── PLAN & BILLING ── */}
-            <Section id="billing" title="Plan & Billing" icon={CreditCard}>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-semibold text-gray-900">Free Plan</span>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">CURRENT</span>
-                  </div>
-                  <p className="text-xs text-gray-500">5 videos/month · 1080p · 3 voices · Community support</p>
-                </div>
-                <button className="btn-primary text-sm px-5 py-2.5 shrink-0">Upgrade to Creator</button>
-              </div>
-
-              <div className="mt-5 p-4 rounded-lg bg-blue-50 border border-blue-200">
-                <p className="text-xs font-semibold text-blue-800 mb-1">Creator Plan — $19/mo</p>
-                <p className="text-xs text-blue-600 leading-relaxed">
-                  Unlimited videos · 4K export · 40+ voices · Custom branding · Priority queue
-                </p>
               </div>
             </Section>
 

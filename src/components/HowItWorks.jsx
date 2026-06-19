@@ -65,18 +65,24 @@ export default function HowItWorks() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="card p-7 group"
+                className="card p-7 group relative overflow-hidden"
               >
-                <div className="flex items-start justify-between mb-5">
-                  <div className="w-11 h-11 rounded-lg bg-blue-600 flex items-center justify-center">
+                {/* Large visible step number — behind content */}
+                <span
+                  className="absolute top-4 right-4 text-6xl font-black leading-none select-none pointer-events-none"
+                  style={{ color: '#D1D5DB', zIndex: 0 }}
+                >
+                  {step.number}
+                </span>
+
+                {/* Icon & text — above number */}
+                <div className="relative" style={{ zIndex: 1 }}>
+                  <div className="w-11 h-11 rounded-lg bg-blue-600 flex items-center justify-center mb-5">
                     <Icon size={20} className="text-white" strokeWidth={2} />
                   </div>
-                  <span className="text-4xl font-black text-gray-100 leading-none select-none">
-                    {step.number}
-                  </span>
+                  <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
               </motion.div>
             )
           })}

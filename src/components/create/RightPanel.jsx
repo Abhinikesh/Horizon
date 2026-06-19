@@ -78,7 +78,7 @@ export default function RightPanel({
     window.speechSynthesis.cancel()
     setVoicePlaying(true)
     const utterance  = new SpeechSynthesisUtterance(
-      'Welcome to 360Tales. Experience your story come alive.'
+      'Welcome to Horizon. Experience your story come alive.'
     )
     utterance.lang   = LANG_CODES[language] ?? 'en-US'
     utterance.rate   = 0.9

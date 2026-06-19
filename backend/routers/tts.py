@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from models.database import get_db
-from models.user import User
 from utils.auth_utils import make_current_user_dep
 
 router = APIRouter()
@@ -26,7 +25,7 @@ class TTSPreviewRequest(BaseModel):
 @router.post("/preview")
 async def tts_preview(
     body: TTSPreviewRequest,
-    current_user: User = Depends(_get_current_user),
+    current_user: dict = Depends(_get_current_user),
 ):
     """
     Generate a short audio preview (first 200 chars) using gTTS.
@@ -34,10 +33,11 @@ async def tts_preview(
     """
     text = body.text[:200].strip()
     if not text:
-        text = "Welcome to 360Tales. Experience your story come alive."
+        text = "Welcome to Horizon. Experience your story come alive."
 
-    lang = LANG_CODES.get(body.language, "en")
-    output_path = f"outputs/audio/preview_{current_user.id}.mp3"
+    lang        = LANG_CODES.get(body.language, "en")
+    user_id     = current_user.get("id", "anon")
+    output_path = f"outputs/audio/preview_{user_id}.mp3"
 
     try:
         from gtts import gTTS
