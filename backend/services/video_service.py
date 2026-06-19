@@ -60,6 +60,24 @@ def _run_ffmpeg(cmd: list[str]) -> None:
         raise RuntimeError(f"FFmpeg error:\n{result.stderr[-2000:]}")
 
 
+def _escape_srt_path(path: str) -> str:
+    """
+    Escape an SRT path for use inside an FFmpeg -vf subtitles= filter.
+
+    FFmpeg's libavfilter parses filter strings with its own rules:
+    - The path must be an absolute path (avoids working-dir issues)
+    - Single-quotes wrap the path, so any single-quote inside must be escaped
+    - Colons inside the quoted path must be escaped as \\:
+    - Backslashes must be escaped as \\\\
+    """
+    path = os.path.abspath(path)
+    # On macOS/Linux paths won't have backslashes, but be safe
+    path = path.replace("\\", "\\\\")
+    path = path.replace("'",  "\\'")
+    path = path.replace(":",  "\\:")
+    return path
+
+
 def _assemble(
     video_path: str,
     audio_path: str,
@@ -69,11 +87,11 @@ def _assemble(
     export_format: str,
 ) -> str:
     run_id  = str(uuid.uuid4())[:8]
-    tmp_dir = f"outputs/videos/tmp_{run_id}"
+    tmp_dir = os.path.abspath(f"outputs/videos/tmp_{run_id}")
     os.makedirs(tmp_dir, exist_ok=True)
 
     # ── Step 1: Merge video + audio ──────────────────────────────────────────
-    merged = f"{tmp_dir}/merged.mp4"
+    merged = os.path.join(tmp_dir, "merged.mp4")
     _run_ffmpeg([
         "ffmpeg", "-y",
         "-i", video_path,
@@ -89,30 +107,41 @@ def _assemble(
     ])
 
     # ── Step 2: Subtitles ────────────────────────────────────────────────────
+    current = merged
     if burn_subtitles and narration_text.strip():
-        srt_path = _generate_srt(narration_text, tmp_dir)
-        subtitled = f"{tmp_dir}/subtitled.mp4"
-        # Escape path for FFmpeg filter (colons must be escaped on Windows)
-        safe_srt = srt_path.replace("\\", "/").replace(":", "\\:")
-        _run_ffmpeg([
-            "ffmpeg", "-y",
-            "-i", merged,
-            "-vf", (
-                f"subtitles='{safe_srt}'"
-                ":force_style='FontSize=18,PrimaryColour=&H00FFFFFF,"
-                "OutlineColour=&H00000000,BorderStyle=3,Outline=1,Shadow=0'"
-            ),
-            "-c:a", "copy",
-            subtitled,
-        ])
-        current = subtitled
-    else:
-        current = merged
+        srt_path  = _generate_srt(narration_text, tmp_dir)
+        subtitled = os.path.join(tmp_dir, "subtitled.mp4")
+        safe_srt  = _escape_srt_path(srt_path)
+
+        # force_style values: no single-quotes inside the value (use ASS hex)
+        style = (
+            "FontSize=18,"
+            "PrimaryColour=&H00FFFFFF,"
+            "OutlineColour=&H00000000,"
+            "BorderStyle=3,"
+            "Outline=1,"
+            "Shadow=0"
+        )
+        # Full filter string: subtitles='<escaped_path>':force_style='<style>'
+        vf_filter = f"subtitles='{safe_srt}':force_style='{style}'"
+
+        try:
+            _run_ffmpeg([
+                "ffmpeg", "-y",
+                "-i", merged,
+                "-vf", vf_filter,
+                "-c:a", "copy",
+                subtitled,
+            ])
+            current = subtitled
+        except RuntimeError:
+            # If subtitle burning fails (e.g. font not found), skip it gracefully
+            current = merged
 
     # ── Step 3: Resize for export format ────────────────────────────────────
     scale = FORMAT_SCALE.get(export_format)
     if scale:
-        resized = f"{tmp_dir}/resized.mp4"
+        resized = os.path.join(tmp_dir, "resized.mp4")
         _run_ffmpeg([
             "ffmpeg", "-y",
             "-i", current,
@@ -161,8 +190,8 @@ def _generate_srt(text: str, tmp_dir: str) -> str:
 
 
 def _srt_ts(seconds: int) -> str:
-    h   = seconds // 3600
-    m   = (seconds % 3600) // 60
-    s   = seconds % 60
-    ms  = 0
+    h  = seconds // 3600
+    m  = (seconds % 3600) // 60
+    s  = seconds % 60
+    ms = 0
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"

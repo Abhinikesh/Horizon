@@ -124,10 +124,11 @@ export default function LoginPage() {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google sign in failed. Please try again.')}
-            width="100%"
+            width={380}
             text="continue_with"
             shape="rectangular"
             theme="outline"
+            logo_alignment="left"
           />
         </div>
 

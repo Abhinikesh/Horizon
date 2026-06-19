@@ -10,7 +10,7 @@ export default function TopBar() {
           <Globe size={14} className="text-white" strokeWidth={2.5} />
         </div>
         <span className="text-base font-bold text-gray-900 tracking-tight hidden sm:block">
-          360<span className="text-blue-600">Tales</span>
+          Hori<span className="text-blue-600">zon</span>
         </span>
       </Link>
 

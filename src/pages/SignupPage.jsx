@@ -162,10 +162,11 @@ export default function SignupPage() {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google sign in failed. Please try again.')}
-            width="100%"
+            width={380}
             text="signup_with"
             shape="rectangular"
             theme="outline"
+            logo_alignment="left"
           />
         </div>
 
