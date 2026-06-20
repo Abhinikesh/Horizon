@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Globe, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import { authAPI } from '../services/api'
@@ -11,6 +11,9 @@ export default function LoginPage() {
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState('')
   const navigate = useNavigate()
+  const location  = useLocation()
+  // Handles BOTH: state.from = '/demo-maker' (string) OR state.from = location object
+  const redirectTo = location.state?.from?.pathname || location.state?.from || '/dashboard'
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -18,7 +21,8 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await authAPI.login(email, password)
-      navigate('/dashboard')
+      console.log('[Login] Email login success → navigating to:', redirectTo)
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       setError(err.message || 'Invalid email or password')
     } finally {
@@ -31,8 +35,12 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await authAPI.googleAuth(credentialResponse.credential)
-      navigate('/dashboard')
+      // Must compute redirectTo AFTER auth so token is already stored
+      const from = location.state?.from?.pathname || location.state?.from || '/dashboard'
+      console.log('[Login] Google success → navigating to:', from)
+      navigate(from, { replace: true })
     } catch (err) {
+      console.error('[Login] Google auth error:', err)
       setError(err.message || 'Google sign in failed. Please try again.')
     } finally {
       setLoading(false)

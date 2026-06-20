@@ -226,3 +226,13 @@ export const qrAPI = {
     return URL.createObjectURL(blob)
   },
 }
+
+// ─── Demo Maker ───────────────────────────────────────────────────────────────
+
+export const demoAPI = {
+  /** POST /api/demo/photos-to-video — returns { project_id } */
+  photosToVideo: (body) => api.post('/api/demo/photos-to-video', body),
+
+  /** POST /api/demo/voiceover-video — returns { project_id } */
+  voiceoverVideo: (body) => api.post('/api/demo/voiceover-video', body),
+}

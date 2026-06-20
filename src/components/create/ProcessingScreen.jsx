@@ -18,12 +18,16 @@ const STEPS = [
  *  - progress      : number   — 0-100, driven by real backend poll
  *  - stepIndex     : number   — 0-5, driven by real backend poll
  *  - onComplete    : fn       — called when processing finishes
+ *  - steps         : string[] — custom step labels (defaults to STEPS)
+ *  - taskLabel     : string   — bottom progress-bar label
  */
 export default function ProcessingScreen({
   useDemoTimer = false,
   progress: externalProgress = 0,
   stepIndex: externalStep = 0,
   onComplete,
+  steps = STEPS,
+  taskLabel = 'Processing your story',
 }) {
   const [localProgress, setLocalProgress] = useState(0)
   const [localStep,     setLocalStep]     = useState(0)
@@ -104,13 +108,13 @@ export default function ProcessingScreen({
 
         {/* Step text */}
         <div className="text-center space-y-1.5">
-          <p className="text-base font-semibold text-gray-900">{STEPS[stepIdx]}</p>
+          <p className="text-base font-semibold text-gray-900">{steps[Math.min(stepIdx, steps.length - 1)]}</p>
           <p className="text-sm text-gray-400">Please keep this tab open</p>
         </div>
 
         {/* Step dots */}
         <div className="flex gap-2">
-          {STEPS.map((_, i) => (
+          {steps.map((_, i) => (
             <div key={i} className={`w-2 h-2 rounded-full transition-colors duration-300 ${
               i < stepIdx ? 'bg-blue-600' : i === stepIdx ? 'bg-blue-400 scale-125' : 'bg-gray-200'
             }`} />
@@ -126,7 +130,7 @@ export default function ProcessingScreen({
             />
           </div>
           <div className="flex justify-between text-xs text-gray-400">
-            <span>Processing your story</span>
+            <span>{taskLabel}</span>
             <span className="tabular-nums">~{remaining}s remaining</span>
           </div>
         </div>

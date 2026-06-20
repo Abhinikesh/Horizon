@@ -80,6 +80,18 @@ export default function Sidebar({ onClose }) {
           <LogOut size={15} />
           Log Out
         </button>
+
+        {/* Secondary tool — visually separated, not a core nav item */}
+        <div className="pt-3 border-t border-gray-100">
+          <NavLink
+            to="/demo-maker"
+            onClick={onClose}
+            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 transition-colors px-1 py-1"
+            style={{ fontSize: '0.78rem' }}
+          >
+            🎬 Also try: Demo Maker →
+          </NavLink>
+        </div>
       </div>
     </aside>
   )

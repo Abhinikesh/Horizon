@@ -48,16 +48,17 @@ app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 app.mount("/uploads", StaticFiles(directory="uploads"),  name="uploads")
 
 # ─── Routers ──────────────────────────────────────────────────────────────────
-from routers import auth, upload, generate, projects, tts, ai, music, qr
+from routers import auth, upload, generate, projects, tts, ai, music, qr, demo_maker
 
-app.include_router(auth.router,     prefix="/api/auth",     tags=["auth"])
-app.include_router(upload.router,   prefix="/api/upload",   tags=["upload"])
-app.include_router(generate.router, prefix="/api/generate", tags=["generate"])
-app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
-app.include_router(tts.router,      prefix="/api/tts",      tags=["tts"])
-app.include_router(ai.router,       prefix="/api/ai",       tags=["ai"])
-app.include_router(music.router,    prefix="/api/music",    tags=["music"])
-app.include_router(qr.router,       prefix="/api/qr",       tags=["qr"])
+app.include_router(auth.router,        prefix="/api/auth",     tags=["auth"])
+app.include_router(upload.router,      prefix="/api/upload",   tags=["upload"])
+app.include_router(generate.router,    prefix="/api/generate", tags=["generate"])
+app.include_router(projects.router,    prefix="/api/projects", tags=["projects"])
+app.include_router(tts.router,         prefix="/api/tts",      tags=["tts"])
+app.include_router(ai.router,          prefix="/api/ai",       tags=["ai"])
+app.include_router(music.router,       prefix="/api/music",    tags=["music"])
+app.include_router(qr.router,          prefix="/api/qr",       tags=["qr"])
+app.include_router(demo_maker.router,  prefix="/api/demo",     tags=["demo"])
 
 # ─── Health check ─────────────────────────────────────────────────────────────
 @app.get("/api/health", tags=["health"])

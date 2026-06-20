@@ -7,7 +7,7 @@ import { qrAPI } from '../../services/api'
 const SAMPLE_VIDEO  = 'https://www.w3schools.com/html/mov_bbb.mp4'
 const SAMPLE_SHARE  = 'https://horizon.app/share/demo-story-001'
 
-export default function ResultScreen({ fileUrl, format, language, voiceStyle, resultData, onCreateAnother }) {
+export default function ResultScreen({ fileUrl, format, language, voiceStyle, resultData, onCreateAnother, showQR = true }) {
   const addToast        = useToast()
   const [videoErr, setVideoErr]     = useState(false)
   const [reelsModal, setReelsModal] = useState(false)
@@ -141,7 +141,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, re
             </div>
 
             {/* ── QR Code section ── */}
-            <div className="pt-2">
+            {showQR && <div className="pt-2">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-px flex-1 bg-gray-200" />
                 <span className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -202,7 +202,7 @@ export default function ResultScreen({ fileUrl, format, language, voiceStyle, re
                   </div>
                 </div>
               </div>
-            </div>
+            </div>}
 
             <div className="pt-1">
               <button onClick={onCreateAnother}

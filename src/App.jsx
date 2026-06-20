@@ -10,6 +10,7 @@ import SettingsPage         from './pages/SettingsPage'
 import ProjectsPage         from './pages/ProjectsPage'
 import HelpPage             from './pages/HelpPage'
 import SharePage            from './pages/SharePage'
+import DemoMakerPage        from './pages/DemoMakerPage'
 
 export default function App() {
   return (
@@ -26,6 +27,8 @@ export default function App() {
           <Route path="/help"      element={<ErrorBoundary><HelpPage /></ErrorBoundary>} />
           {/* Public — no auth required */}
           <Route path="/share/:projectId" element={<ErrorBoundary><SharePage /></ErrorBoundary>} />
+          {/* Direct-URL only — not in any nav menu */}
+          <Route path="/demo-maker" element={<ErrorBoundary><DemoMakerPage /></ErrorBoundary>} />
         </Routes>
       </BrowserRouter>
     </ToastProvider>

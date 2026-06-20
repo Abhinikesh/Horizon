@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Globe, Menu, X } from 'lucide-react'
 
 const navLinks = [
@@ -8,9 +8,23 @@ const navLinks = [
   { label: 'Features',     href: '/#features' },
 ]
 
+/** Navigate to /demo-maker — requires auth, so redirect via /login if needed. */
+function useDemoMakerNav() {
+  const navigate = useNavigate()
+  return () => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      navigate('/demo-maker')
+    } else {
+      navigate('/login', { state: { from: '/demo-maker' } })
+    }
+  }
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const goDemoMaker = useDemoMakerNav()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -43,6 +57,17 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+
+          {/* Demo Maker link with BETA badge */}
+          <button
+            onClick={goDemoMaker}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            Demo Maker
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 leading-none">
+              BETA
+            </span>
+          </button>
         </div>
 
         {/* Auth CTA */}
@@ -79,6 +104,18 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+
+            {/* Demo Maker in mobile drawer */}
+            <button
+              onClick={() => { setMenuOpen(false); goDemoMaker() }}
+              className="w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+            >
+              Demo Maker
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 leading-none">
+                BETA
+              </span>
+            </button>
+
             <div className="pt-3 pb-1 flex gap-2">
               <Link to="/login"  className="flex-1 btn-outline text-center" onClick={() => setMenuOpen(false)}>Log In</Link>
               <Link to="/signup" className="flex-1 btn-primary text-center" onClick={() => setMenuOpen(false)}>Sign Up</Link>
